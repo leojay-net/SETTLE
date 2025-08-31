@@ -1,0 +1,5 @@
+@chainlink/contracts-ccip/contracts/=lib/chainlink-brownie-contracts/contracts/src/v0.8/ccip/
+@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/src/v0.8/
+openzeppelin-solidity/=lib/openzeppelin-contracts/contracts/
+openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/
+forge-std/=lib/forge-std/src/
