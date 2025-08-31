@@ -16,6 +16,16 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Integration Demo (Hosted Checkout flow)
+
+- Visit `/integration-demo` to simulate a third-party app using Settle's hosted checkout.
+- Clicking "Checkout with Settle" redirects to `/payment-demo` with URL params (amount, orderId, token, chain, description, redirectUrl).
+- After the simulated confirmation, you'll be redirected to `/payment-success` and see details reflected from the checkout.
+
+Environment:
+
+- Set `NEXT_PUBLIC_SETTLE_PK` in `.env` (optional). Default is `pk_test_demo`.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

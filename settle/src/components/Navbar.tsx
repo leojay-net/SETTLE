@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { Wallet, Menu, X } from 'lucide-react'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { usePrivy } from '@privy-io/react-auth'
 
 const fadeIn = {
     initial: { opacity: 0, y: 10 },
@@ -15,7 +15,6 @@ const fadeIn = {
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const { login, logout, ready, authenticated, user } = usePrivy()
-    const { wallets } = useWallets()
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/40 shadow-sm">

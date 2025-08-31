@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
     ArrowLeft,
     Copy,
@@ -13,18 +13,30 @@ import {
 import QRCode from 'react-qr-code'
 import Link from 'next/link'
 import { chains, tokens, calculateCryptoAmount, formatCrypto, generatePaymentAddress } from '../lib/utils'
+import { useSearchParams } from 'next/navigation'
 
 // Animation variants were previously defined but unused; removed to satisfy lint
 
 export default function PaymentWidget() {
-    const [selectedChain, setSelectedChain] = useState(chains[0])
-    const [selectedToken, setSelectedToken] = useState(tokens[2]) // ETH
+    const params = useSearchParams()
+    const urlAmount = parseFloat(params.get('amount') || '150') || 150
+    const urlToken = (params.get('token') || 'ETH').toUpperCase()
+    const urlChain = (params.get('chain') || 'ethereum').toLowerCase()
+    const urlOrderId = params.get('orderId') || 'ORDER-12345'
+    const urlRedirect = params.get('redirectUrl') || '/payment-success'
+    const urlDesc = params.get('description') || 'Demo Store Purchase'
+
+    const initialToken = useMemo(() => tokens.find(t => t.symbol.toUpperCase() === urlToken) || tokens[2], [urlToken])
+    const initialChain = useMemo(() => chains.find(c => c.id === urlChain) || chains[0], [urlChain])
+
+    const [selectedChain, setSelectedChain] = useState(initialChain)
+    const [selectedToken, setSelectedToken] = useState(initialToken) // ETH default
     const [paymentStatus, setPaymentStatus] = useState<'pending' | 'detected' | 'confirmed'>('pending')
     const [copied, setCopied] = useState(false)
     const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false)
     const [isTokenDropdownOpen, setIsTokenDropdownOpen] = useState(false)
 
-    const usdAmount = 150.00
+    const usdAmount = urlAmount
     const cryptoAmount = calculateCryptoAmount(usdAmount, selectedToken.symbol)
     const paymentAddress = generatePaymentAddress()
 
@@ -39,7 +51,15 @@ export default function PaymentWidget() {
         setTimeout(() => {
             setPaymentStatus('confirmed')
             setTimeout(() => {
-                window.location.href = '/payment-success'
+                try {
+                    const redirect = new URL(urlRedirect, window.location.origin)
+                    redirect.searchParams.set('orderId', urlOrderId)
+                    redirect.searchParams.set('amount', usdAmount.toFixed(2))
+                    redirect.searchParams.set('description', urlDesc)
+                    window.location.href = redirect.toString()
+                } catch {
+                    window.location.href = urlRedirect
+                }
             }, 2000)
         }, 3000)
     }
@@ -101,7 +121,8 @@ export default function PaymentWidget() {
 
                     <div className="text-center">
                         <p className="text-3xl font-bold text-white mb-2">${usdAmount.toFixed(2)}</p>
-                        <p className="text-white/60">Demo Store Purchase</p>
+                        <p className="text-white/60">{urlDesc}</p>
+                        <p className="text-white/40 text-xs mt-1">Order: {urlOrderId}</p>
                     </div>
                 </div>
 

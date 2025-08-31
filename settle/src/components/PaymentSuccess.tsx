@@ -13,6 +13,7 @@ import {
     Shield
 } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 const fadeIn = {
     initial: { opacity: 0, y: 20 },
@@ -32,12 +33,16 @@ const bounceIn = {
 }
 
 export default function PaymentSuccess() {
+    const params = useSearchParams()
+    const orderIdParam = params.get('orderId') || 'ORDER-12345'
+    const amountParam = params.get('amount') || '150.00'
+    const descriptionParam = params.get('description') || 'Demo Store Purchase'
     const [copied, setCopied] = useState(false)
     const [timeElapsed, setTimeElapsed] = useState(0)
 
     const mockPayment = {
-        orderId: 'ORDER-12345',
-        amount: '$150.00',
+        orderId: orderIdParam,
+        amount: `$${amountParam}`,
         customerPayment: '0.05 ETH',
         sourceChain: 'Ethereum',
         settlementAmount: '150.23 USDC',
@@ -110,9 +115,7 @@ export default function PaymentSuccess() {
                             <CheckCircle className="w-10 h-10 text-white" />
                         </div>
                         <h1 className="text-3xl font-bold text-white mb-2">Payment Successful!</h1>
-                        <p className="text-white/80">
-                            Your crypto payment has been processed and settled
-                        </p>
+                        <p className="text-white/80">Your crypto payment for {descriptionParam} has been processed and settled</p>
                     </motion.div>
 
                     {/* Payment Details */}
