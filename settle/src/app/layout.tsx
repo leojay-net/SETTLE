@@ -3,6 +3,7 @@ import "./globals.css";
 import GlobalNav from "../components/Navbar";
 import Providers from "../components/Providers";
 import { Inter } from "next/font/google";
+import { headers } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -18,17 +19,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headersObj = await headers();
+  const cookies = headersObj.get('cookie');
+
   return (
     <html lang="en">
       <head></head>
       <body className={`${inter.className} antialiased`}>
         {/* Global Navbar */}
-        <Providers>
+        <Providers cookies={cookies}>
           <div id="app-root" className="min-h-screen">
             <GlobalNav />
             <main className="pt-24">

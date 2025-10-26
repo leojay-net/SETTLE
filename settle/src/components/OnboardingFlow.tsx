@@ -1,8 +1,8 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
+import { useState, useEffect } from 'react'
+import { useAppKit, useAppKitAccount } from '@reown/appkit/react'
 import {
     ArrowRight,
     ArrowLeft,
@@ -27,7 +27,8 @@ const slideIn = {
 }
 
 export default function OnboardingFlow() {
-    const { login, authenticated, user, ready } = usePrivy()
+    const { open } = useAppKit()
+    const { address, isConnected } = useAppKitAccount()
     const [currentStep, setCurrentStep] = useState(1)
     const [formData, setFormData] = useState({
         businessName: '',
@@ -38,6 +39,17 @@ export default function OnboardingFlow() {
     })
     const [walletConnected, setWalletConnected] = useState(false)
     const [copied, setCopied] = useState(false)
+
+    // Update wallet connected state when address changes
+    useEffect(() => {
+        if (isConnected && address) {
+            setWalletConnected(true)
+            setFormData(prev => ({
+                ...prev,
+                walletAddress: address
+            }))
+        }
+    }, [isConnected, address])
 
     const totalSteps = 4
 
@@ -54,14 +66,7 @@ export default function OnboardingFlow() {
     }
 
     const connectWallet = async () => {
-        await login()
-        if (user?.wallet?.address) {
-            setWalletConnected(true)
-            setFormData({
-                ...formData,
-                walletAddress: user.wallet.address
-            })
-        }
+        await open()
     }
 
     const copyToClipboard = async (text: string) => {
@@ -138,7 +143,7 @@ export default function OnboardingFlow() {
                             </p>
                         </div>
 
-                        {!walletConnected && !(ready && authenticated) ? (
+                        {!walletConnected && !isConnected ? (
                             <div className="text-center">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
@@ -160,9 +165,9 @@ export default function OnboardingFlow() {
                                 <div className="bg-[#001122] border border-white/10 rounded-lg p-4">
                                     <p className="text-white/60 text-sm mb-2">Connected Wallet Address</p>
                                     <div className="flex items-center justify-between">
-                                        <p className="text-white font-mono">{formData.walletAddress || user?.wallet?.address}</p>
+                                        <p className="text-white font-mono">{formData.walletAddress || address}</p>
                                         <button
-                                            onClick={() => copyToClipboard(formData.walletAddress || user?.wallet?.address || '')}
+                                            onClick={() => copyToClipboard(formData.walletAddress || address || '')}
                                             className="text-[#ffd60a] hover:text-[#ffea5a] transition-colors"
                                         >
                                             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
