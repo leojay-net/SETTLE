@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { Wallet, Menu, X } from 'lucide-react'
-import { usePrivy } from '@privy-io/react-auth'
+import { useAppKit, useAppKitAccount } from '@reown/appkit/react'
 
 const fadeIn = {
     initial: { opacity: 0, y: 10 },
@@ -14,7 +14,8 @@ const fadeIn = {
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const { login, logout, ready, authenticated, user } = usePrivy()
+    const { open } = useAppKit()
+    const { address, isConnected } = useAppKitAccount()
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/40 shadow-sm">
@@ -44,16 +45,16 @@ export default function Navbar() {
                             Dashboard
                         </Link>
                         <div className="ml-4 pl-6 border-l border-slate-700 flex items-center gap-3">
-                            {ready && authenticated && (
+                            {isConnected && address && (
                                 <span className="text-slate-300 text-sm font-mono">
-                                    {user?.wallet?.address?.slice(0, 6)}...{user?.wallet?.address?.slice(-4)}
+                                    {address.slice(0, 6)}...{address.slice(-4)}
                                 </span>
                             )}
-                            {ready && !authenticated ? (
+                            {!isConnected ? (
                                 <motion.button
                                     whileHover={{ scale: 1.03, y: -1 }}
                                     whileTap={{ scale: 0.98 }}
-                                    onClick={() => login()}
+                                    onClick={() => open()}
                                     className="bg-accent text-white px-6 py-3 rounded-xl font-semibold text-lg hover:bg-accent-light transition-colors"
                                 >
                                     Connect Wallet
@@ -62,10 +63,10 @@ export default function Navbar() {
                                 <motion.button
                                     whileHover={{ scale: 1.03, y: -1 }}
                                     whileTap={{ scale: 0.98 }}
-                                    onClick={() => logout()}
+                                    onClick={() => open()}
                                     className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition-colors"
                                 >
-                                    Logout
+                                    Account
                                 </motion.button>
                             )}
                         </div>
@@ -105,13 +106,13 @@ export default function Navbar() {
                                 Dashboard
                             </Link>
                             <div className="pt-4 mt-4 border-t border-slate-700/50">
-                                {!authenticated ? (
-                                    <button onClick={() => { setIsMenuOpen(false); login(); }} className="w-full bg-accent hover:bg-accent-light text-white px-6 py-4 rounded-xl font-semibold text-lg transition-colors">
+                                {!isConnected ? (
+                                    <button onClick={() => { setIsMenuOpen(false); open(); }} className="w-full bg-accent hover:bg-accent-light text-white px-6 py-4 rounded-xl font-semibold text-lg transition-colors">
                                         Connect Wallet
                                     </button>
                                 ) : (
-                                    <button onClick={() => { setIsMenuOpen(false); logout(); }} className="w-full bg-slate-800 hover:bg-slate-700 text-white px-6 py-4 rounded-xl font-semibold text-lg transition-colors">
-                                        Logout
+                                    <button onClick={() => { setIsMenuOpen(false); open(); }} className="w-full bg-slate-800 hover:bg-slate-700 text-white px-6 py-4 rounded-xl font-semibold text-lg transition-colors">
+                                        Account
                                     </button>
                                 )}
                             </div>
